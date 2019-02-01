@@ -20,22 +20,22 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
 //        ActivityCompat.requestPermissions(this, new String[]{ACCESS_COARSE_LOCATION}, REQUEST_CODE);
-        if (ActivityCompat.checkSelfPermission(MainActivity.this,
-                ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            SplashTimeout = 8000;
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("Location Access is necessary to find News for your location please provide access")
-                    .setTitle("Location Access Required").setCancelable(false).setPositiveButton("Cancel",
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{ACCESS_COARSE_LOCATION}, REQUEST_CODE);
-                        }
-                    });
-            AlertDialog alertDialog = builder.create();
-            alertDialog.show();
-
-        }
+//        if (ActivityCompat.checkSelfPermission(MainActivity.this,
+//                ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            SplashTimeout = 8000;
+//            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//            builder.setMessage("Location Access is necessary to find News for your location please provide access")
+//                    .setTitle("Location Access Required").setCancelable(false).setPositiveButton("Cancel",
+//                    new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialogInterface, int i) {
+//                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{ACCESS_COARSE_LOCATION}, REQUEST_CODE);
+//                        }
+//                    });
+//            AlertDialog alertDialog = builder.create();
+//            alertDialog.show();
+//
+//      }
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {

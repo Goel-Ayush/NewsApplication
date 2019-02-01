@@ -15,6 +15,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.content.Loader;
+import android.telephony.TelephonyManager;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 
@@ -31,20 +33,21 @@ public class Main2Activity extends AppCompatActivity implements android.app.Load
     private TextView mEmptyStateTextView;
     private static final int NEWS_LOADER_ID = 1;
     private int count = 0;
-    private static String APIKEY = "1409bbb2b3844910bdd62571fc21c5f0";
-    private static final String NewsApIRequestURL="https://newsapi.org/v2/top-headlines?country=in&category=business&apiKey=1409bbb2b3844910bdd62571fc21c5f0";
-    private static final String NewsApIRequestURL1="https://newsapi.org/v2/";
+    private static String APIKEY = "&apiKey=1409bbb2b3844910bdd62571fc21c5f0";
+    private static String NewsApIRequestURL="https://newsapi.org/v2/top-headlines?country=in&category=business&apiKey=1409bbb2b3844910bdd62571fc21c5f0";
+    private static String NewsApIRequestURL1="https://newsapi.org/v2/";
     private String Location;
     private String category;
-    private static final int REQUEST_CODE = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-
-
-
-
-
+    NewsApIRequestURL1 = NewsApIRequestURL1 + "top-headlines";
+    Location = getUserCountry(this);
+    String loc = Location;
+    NewsApIRequestURL1 = NewsApIRequestURL1 + "?country=" + Location +APIKEY;
+    loc = NewsApIRequestURL1;
+    NewsApIRequestURL = NewsApIRequestURL1;
             if(ActivityCompat.checkSelfPermission(Main2Activity.this,
                     ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED){
                 Toast.makeText(this,"Taking Default : INDIA ",Toast.LENGTH_LONG).show();
@@ -120,4 +123,21 @@ public class Main2Activity extends AppCompatActivity implements android.app.Load
 
     }
 
+    public static String getUserCountry(Context context) {
+        try {
+            final TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+            final String simCountry = tm.getSimCountryIso();
+            if (simCountry != null && simCountry.length() == 2) { // SIM country code is available
+                return simCountry.toLowerCase(Locale.US);
+            }
+            else if (tm.getPhoneType() != TelephonyManager.PHONE_TYPE_CDMA) { // device is not 3G (would be unreliable)
+                String networkCountry = tm.getNetworkCountryIso();
+                if (networkCountry != null && networkCountry.length() == 2) { // network country code is available
+                    return networkCountry.toLowerCase(Locale.US);
+                }
+            }
+        }
+        catch (Exception e) { }
+        return null;
+    }
 }
