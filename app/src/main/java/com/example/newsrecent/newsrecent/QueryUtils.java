@@ -106,7 +106,7 @@ public class QueryUtils {
         String jsonResponse = null;
         try {
             jsonResponse = makeHttpRequest(url);
-            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("JsonResponse", jsonResponse).apply();
+
         } catch (IOException e) {
             Log.e(LOG_TAG, "Problem making the HTTP request.", e);
         }

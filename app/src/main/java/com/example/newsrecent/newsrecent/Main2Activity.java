@@ -74,12 +74,14 @@ public class Main2Activity extends AppCompatActivity implements android.app.Load
             loaderManager.initLoader(NEWS_LOADER_ID,null, this);
         }
         else{
-//            View loadingIndicator = findViewById(R.id.loading_indicator);
-//            loadingIndicator.setVisibility(View.GONE);
             String Response = PreferenceManager.getDefaultSharedPreferences(this).getString("JsonResponse", "0");
             // Update empty state with no connection error message
-            if(Response == "0")
+            if(Response == "0") {
+
+                View loadingIndicator = findViewById(R.id.loading_indicator);
+                loadingIndicator.setVisibility(View.GONE);
                 mEmptyStateTextView.setText("No Internet Connection");
+            }
             else{
 
                 FileInputStream fis = null;
