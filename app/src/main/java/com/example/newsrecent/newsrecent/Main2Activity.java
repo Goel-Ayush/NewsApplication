@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
@@ -21,6 +22,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -46,7 +51,6 @@ public class Main2Activity extends AppCompatActivity implements android.app.Load
     Location = getUserCountry(this);
     String loc = Location;
     NewsApIRequestURL1 = NewsApIRequestURL1 + "?country=" + Location +APIKEY;
-    loc = NewsApIRequestURL1;
     NewsApIRequestURL = NewsApIRequestURL1;
             if(ActivityCompat.checkSelfPermission(Main2Activity.this,
                     ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED){
@@ -58,27 +62,56 @@ public class Main2Activity extends AppCompatActivity implements android.app.Load
         setContentView(R.layout.activitymain);
         ListView NewsView = (ListView) findViewById(R.id.list);
         mAdapter = new NewsAdapter(this,new ArrayList<Newsinfo>());
-
         NewsView.setAdapter(mAdapter);
-
         mEmptyStateTextView = (TextView)findViewById(R.id.empty_view);
         NewsView.setEmptyView(mEmptyStateTextView);
-
         ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
-        if(networkInfo !=null &&networkInfo.isConnected()){
+        if(networkInfo !=null && networkInfo.isConnected()){
             android.app.LoaderManager loaderManager = getLoaderManager();
 
             loaderManager.initLoader(NEWS_LOADER_ID,null, this);
         }
         else{
-            View loadingIndicator = findViewById(R.id.loading_indicator);
-            loadingIndicator.setVisibility(View.GONE);
-
+//            View loadingIndicator = findViewById(R.id.loading_indicator);
+//            loadingIndicator.setVisibility(View.GONE);
+            String Response = PreferenceManager.getDefaultSharedPreferences(this).getString("JsonResponse", "0");
             // Update empty state with no connection error message
-            mEmptyStateTextView.setText("no_internet_connection");
+            if(Response == "0")
+                mEmptyStateTextView.setText("No Internet Connection");
+            else{
+
+                FileInputStream fis = null;
+                ObjectInputStream ois = null;
+                List<Newsinfo> newsinfoList = null;
+
+                try {
+                    // reading binary data
+                    fis = new FileInputStream("SaveArrayList.ser");
+                    // converting binary-data to java-object
+                    ois = new ObjectInputStream(fis);
+                    newsinfoList = (ArrayList<Newsinfo>) ois.readObject();
+
+                }
+                catch (FileNotFoundException fnf) {
+                    fnf.printStackTrace();
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
+                catch (ClassNotFoundException cnf) {
+                    cnf.printStackTrace();
+                }
+                mAdapter.clear();
+                View loadingIndicator = findViewById(R.id.loading_indicator);
+                loadingIndicator.setVisibility(View.GONE);
+                if(newsinfoList != null && !newsinfoList.isEmpty()){
+                    mAdapter.addAll(newsinfoList);
+                }
+                mEmptyStateTextView.setText("NO NEWS FOUND");
+
+            }
             //EmptyTextView should be initialised Showing no Connection or Error in connection
 
         }
@@ -122,6 +155,8 @@ public class Main2Activity extends AppCompatActivity implements android.app.Load
         mAdapter.clear();
 
     }
+
+
 
     public static String getUserCountry(Context context) {
         try {

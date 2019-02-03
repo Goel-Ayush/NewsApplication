@@ -1,16 +1,22 @@
 package com.example.newsrecent.newsrecent;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -20,7 +26,7 @@ import java.util.List;
 
 public class QueryUtils {
     private static String LOG_TAG = QueryUtils.class.getSimpleName();
-
+    public static Context context;
     private static URL createUrl(String stringUrl) {
         URL url = null;
         try {
@@ -29,6 +35,9 @@ public class QueryUtils {
             Log.e(LOG_TAG, "Problem building the URL ", e);
         }
         return url;
+    }
+    public QueryUtils(Context context){
+        this.context = context;
     }
     private static String makeHttpRequest(URL url) throws IOException {
         String jsonResponse = "";
@@ -97,6 +106,7 @@ public class QueryUtils {
         String jsonResponse = null;
         try {
             jsonResponse = makeHttpRequest(url);
+            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("JsonResponse", jsonResponse).apply();
         } catch (IOException e) {
             Log.e(LOG_TAG, "Problem making the HTTP request.", e);
         }
@@ -141,6 +151,28 @@ public class QueryUtils {
                 }
                 newsinfoList.add(new Newsinfo(nNAme,aName,nTitle,nDescription));
 
+                FileOutputStream fos = null;
+                ObjectOutputStream oos = null;
+                try {
+                    // for writing or saving binary data
+                    fos = new FileOutputStream("SaveArrayList.ser");
+
+                    // converting java-object to binary-format
+                    oos = new ObjectOutputStream(fos);
+
+                    // writing ArrayList values to stream
+                    oos.writeObject(newsinfoList);
+                    oos.flush();
+                    oos.close();
+                }
+                catch (FileNotFoundException fnf) {
+                    fnf.printStackTrace();
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
             }
 
 
@@ -159,6 +191,8 @@ public class QueryUtils {
             return newsinfoList;
         }
     }
+
+
 
 
 
