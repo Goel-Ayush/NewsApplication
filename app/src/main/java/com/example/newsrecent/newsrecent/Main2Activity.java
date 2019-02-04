@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
@@ -22,10 +23,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -49,14 +54,8 @@ public class Main2Activity extends AppCompatActivity implements android.app.Load
 
     NewsApIRequestURL1 = NewsApIRequestURL1 + "top-headlines";
     Location = getUserCountry(this);
-    String loc = Location;
     NewsApIRequestURL1 = NewsApIRequestURL1 + "?country=" + Location +APIKEY;
     NewsApIRequestURL = NewsApIRequestURL1;
-            if(ActivityCompat.checkSelfPermission(Main2Activity.this,
-                    ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED){
-                Toast.makeText(this,"Taking Default : INDIA ",Toast.LENGTH_LONG).show();
-            }
-
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activitymain);
@@ -74,51 +73,39 @@ public class Main2Activity extends AppCompatActivity implements android.app.Load
             loaderManager.initLoader(NEWS_LOADER_ID,null, this);
         }
         else{
-            String Response = PreferenceManager.getDefaultSharedPreferences(this).getString("JsonResponse", "0");
-            // Update empty state with no connection error message
-            if(Response == "0") {
 
-                View loadingIndicator = findViewById(R.id.loading_indicator);
-                loadingIndicator.setVisibility(View.GONE);
-                mEmptyStateTextView.setText("No Internet Connection");
-            }
-            else{
 
-                FileInputStream fis = null;
-                ObjectInputStream ois = null;
-                List<Newsinfo> newsinfoList = null;
+                SharedPreferences appSharedPrefs = PreferenceManager
+                        .getDefaultSharedPreferences(this.getApplicationContext());
+                Gson gson = new Gson();
+                String json = appSharedPrefs.getString("MyObject", "");
+                Type type = new TypeToken<List<Newsinfo>>(){}.getType();
+                List<Newsinfo> NewsInfoList = gson.fromJson(json, type);
+                if(NewsInfoList== null){
+                    View loadingIndicator = findViewById(R.id.loading_indicator);
+                    loadingIndicator.setVisibility(View.GONE);
+                    //EmptyTextView should be initialised Showing no Connection or Error in connection
+                    mEmptyStateTextView.setText("No Internet Connection & stored content");
+                }
+                else{
+                    mAdapter.clear();
+                    View loadingIndicator = findViewById(R.id.loading_indicator);
+                    loadingIndicator.setVisibility(View.GONE);
+                    if(NewsInfoList != null && !NewsInfoList.isEmpty()){
+                        mAdapter.addAll(NewsInfoList);
+                    }
+                    mEmptyStateTextView.setText("NO NEWS FOUND");
+                                    }
 
-                try {
-                    // reading binary data
-                    fis = new FileInputStream("SaveArrayList.ser");
-                    // converting binary-data to java-object
-                    ois = new ObjectInputStream(fis);
-                    newsinfoList = (ArrayList<Newsinfo>) ois.readObject();
+                }
 
-                }
-                catch (FileNotFoundException fnf) {
-                    fnf.printStackTrace();
-                }
-                catch (IOException e) {
-                    e.printStackTrace();
-                }
-                catch (ClassNotFoundException cnf) {
-                    cnf.printStackTrace();
-                }
-                mAdapter.clear();
-                View loadingIndicator = findViewById(R.id.loading_indicator);
-                loadingIndicator.setVisibility(View.GONE);
-                if(newsinfoList != null && !newsinfoList.isEmpty()){
-                    mAdapter.addAll(newsinfoList);
-                }
-                mEmptyStateTextView.setText("NO NEWS FOUND");
 
             }
-            //EmptyTextView should be initialised Showing no Connection or Error in connection
 
-        }
 
-    }
+
+
+
 
 
 
@@ -149,7 +136,9 @@ public class Main2Activity extends AppCompatActivity implements android.app.Load
             if(newsinfoList != null && !newsinfoList.isEmpty()){
                 mAdapter.addAll(newsinfoList);
             }
-        mEmptyStateTextView.setText("NO NEWS FOUND");
+            else
+                mEmptyStateTextView.setText("NO NEWS FOUND");
+            offlineIt(newsinfoList);
     }
 
     public void onLoaderReset(Loader<List<Newsinfo>> newsLoader){
@@ -176,5 +165,15 @@ public class Main2Activity extends AppCompatActivity implements android.app.Load
         }
         catch (Exception e) { }
         return null;
+    }
+
+    public void offlineIt(List<Newsinfo> newsinfoList){
+        SharedPreferences appSharedPrefs = PreferenceManager
+                .getDefaultSharedPreferences(this);
+        SharedPreferences.Editor prefsEditor = appSharedPrefs.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(newsinfoList);
+        prefsEditor.putString("MyObject", json);
+        prefsEditor.commit();
     }
 }

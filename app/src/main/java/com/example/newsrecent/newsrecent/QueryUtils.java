@@ -5,6 +5,9 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
+
+import com.google.gson.Gson;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -106,6 +109,7 @@ public class QueryUtils {
         String jsonResponse = null;
         try {
             jsonResponse = makeHttpRequest(url);
+//            offlineIt(jsonResponse,"JsonResponse");
 
         } catch (IOException e) {
             Log.e(LOG_TAG, "Problem making the HTTP request.", e);
@@ -113,7 +117,6 @@ public class QueryUtils {
 
         // Extract relevant fields from the JSON response and create a list of {@link Earthquake}s
         List<Newsinfo> newsinfoList = extractFeatureFromJson(jsonResponse);
-
         // Return the list of {@link Earthquake}s
         return newsinfoList;
     }
@@ -132,7 +135,7 @@ public class QueryUtils {
 
             JSONArray  NewsArray = root.getJSONArray("articles");
 
-            for(int i =0; i<NewsArray.length();i++){
+            for(int i =0; i<NewsArray.length();i++) {
 
                 JSONObject currentNews1 = NewsArray.getJSONObject(i);
                 JSONObject currentNews = currentNews1.getJSONObject("source");
@@ -140,42 +143,17 @@ public class QueryUtils {
                 String aName = currentNews1.getString("author");
                 String nTitle = currentNews1.getString("title");
                 String nDescription = currentNews1.getString("description").trim();
-                if(aName=="null"){
+                if (aName == "null") {
 
                     aName = "";
 
                 }
 
-                if(nDescription=="null" || nDescription==""){
-                    nDescription ="**Text not found Will be Updated Soon**";
+                if (nDescription == "null" || nDescription == "") {
+                    nDescription = "**Text not found Will be Updated Soon**";
                 }
-                newsinfoList.add(new Newsinfo(nNAme,aName,nTitle,nDescription));
-
-                FileOutputStream fos = null;
-                ObjectOutputStream oos = null;
-                try {
-                    // for writing or saving binary data
-                    fos = new FileOutputStream("SaveArrayList.ser");
-
-                    // converting java-object to binary-format
-                    oos = new ObjectOutputStream(fos);
-
-                    // writing ArrayList values to stream
-                    oos.writeObject(newsinfoList);
-                    oos.flush();
-                    oos.close();
-                }
-                catch (FileNotFoundException fnf) {
-                    fnf.printStackTrace();
-                }
-                catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-
+                newsinfoList.add(new Newsinfo(nNAme, aName, nTitle, nDescription));
             }
-
-
 
         }
         catch (JSONException e) {
@@ -187,14 +165,13 @@ public class QueryUtils {
 
         finally {
 
-
             return newsinfoList;
         }
     }
 
 
 
-
-
 }
+
+
 
