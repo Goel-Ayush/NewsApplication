@@ -1,6 +1,7 @@
 package com.example.newsrecent.newsrecent;
 
 import android.Manifest;
+import android.app.SearchManager;
 import android.content.Context;
 
 import android.content.DialogInterface;
@@ -18,8 +19,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.content.Loader;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,7 +54,7 @@ public class Main2Activity extends AppCompatActivity implements android.app.Load
     private static String NewsApIRequestURL1="https://newsapi.org/v2/";
     private String Location;
     private String category;
-
+    private ListView NewsView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -57,9 +63,10 @@ public class Main2Activity extends AppCompatActivity implements android.app.Load
     NewsApIRequestURL1 = NewsApIRequestURL1 + "?country=" + Location +APIKEY;
     NewsApIRequestURL = NewsApIRequestURL1;
 
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activitymain);
-        ListView NewsView = (ListView) findViewById(R.id.list);
+        NewsView = (ListView) findViewById(R.id.list);
         mAdapter = new NewsAdapter(this,new ArrayList<Newsinfo>());
         NewsView.setAdapter(mAdapter);
         mEmptyStateTextView = (TextView)findViewById(R.id.empty_view);
@@ -102,13 +109,42 @@ public class Main2Activity extends AppCompatActivity implements android.app.Load
 
             }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.search_menu, menu);
 
+        SearchManager searchManager = (SearchManager)
+                getSystemService(Context.SEARCH_SERVICE);
+        MenuItem searchMenuItem = menu.findItem(R.id.search);
+        SearchView searchView = (SearchView) searchMenuItem.getActionView();
 
+        searchView.setSearchableInfo(searchManager.
+                getSearchableInfo(getComponentName()));
+        searchView.setSubmitButtonEnabled(true);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                return false;
+            }
 
+            @Override
+            public boolean onQueryTextChange(String s) {
+                mAdapter.getFilter().filter(s);
 
+                        if (TextUtils.isEmpty(s)) {
+                            NewsView.clearTextFilter();
+        }
+        else {
+            NewsView.setFilterText(s);
+        }
 
+                return true;
+            }
+        });
 
-
+        return true;
+    }
 
 
     @Override
