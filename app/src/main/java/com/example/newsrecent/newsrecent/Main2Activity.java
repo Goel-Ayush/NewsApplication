@@ -5,11 +5,13 @@ import android.app.SearchManager;
 import android.content.Context;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.LoaderManager;
@@ -24,6 +26,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -71,6 +74,15 @@ public class Main2Activity extends AppCompatActivity implements android.app.Load
         NewsView.setAdapter(mAdapter);
         mEmptyStateTextView = (TextView)findViewById(R.id.empty_view);
         NewsView.setEmptyView(mEmptyStateTextView);
+        NewsView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Newsinfo clickedNews = (Newsinfo) NewsView.getItemAtPosition(i);
+                Intent intent = new Intent(Main2Activity.this,fullNews.class);
+                intent.putExtra("CLickedNewsText",clickedNews.getUrltopage());
+                startActivity(intent);
+            }
+        });
         ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
@@ -212,4 +224,6 @@ public class Main2Activity extends AppCompatActivity implements android.app.Load
         prefsEditor.putString("MyObject", json);
         prefsEditor.commit();
     }
+
+
 }

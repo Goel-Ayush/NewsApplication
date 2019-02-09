@@ -22,6 +22,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -143,6 +144,7 @@ public class QueryUtils {
                 String aName = currentNews1.getString("author");
                 String nTitle = currentNews1.getString("title");
                 String nDescription = currentNews1.getString("description").trim();
+                String uri = currentNews1.getString("url");
                 if (aName == "null") {
 
                     aName = "";
@@ -152,7 +154,8 @@ public class QueryUtils {
                 if (nDescription == "null" || nDescription == "") {
                     nDescription = "**Text not found Will be Updated Soon**";
                 }
-                newsinfoList.add(new Newsinfo(nNAme, aName, nTitle, nDescription));
+
+                newsinfoList.add(new Newsinfo(nNAme, aName, nTitle, nDescription,uri));
             }
 
         }

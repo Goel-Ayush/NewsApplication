@@ -8,13 +8,14 @@ public class Newsinfo {
     String nAuthorName;
     String nTitle;
     String nDescription;
-   // URI urltoimage;
+    String nurltopage;
 
-    public Newsinfo (String name, String aName, String title, String Description ){
+    public Newsinfo (String name, String aName, String title, String Description, String urltopage ){
         nName = name;
         nAuthorName = aName;
         nTitle = title;
         nDescription = Description;
+        this.nurltopage = urltopage;
     }
 
     public Newsinfo(){
@@ -22,9 +23,14 @@ public class Newsinfo {
         nAuthorName = "0";
         nTitle = "0";
         nDescription = "0";
+        nurltopage = null ;
     }
     public String getnAuthorName() {
         return nAuthorName;
+    }
+
+    public String getUrltopage() {
+        return nurltopage;
     }
 
     public String getnDescription() {
