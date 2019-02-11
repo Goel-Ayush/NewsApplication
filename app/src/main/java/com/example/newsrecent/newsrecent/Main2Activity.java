@@ -66,7 +66,7 @@ public class Main2Activity extends AppCompatActivity implements android.app.Load
     NewsApIRequestURL1 = NewsApIRequestURL1 + "?country=" + Location +APIKEY;
     NewsApIRequestURL = NewsApIRequestURL1;
 
-
+        startService(new Intent(this,  notification.class));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activitymain);
         NewsView = (ListView) findViewById(R.id.list);
@@ -100,7 +100,7 @@ public class Main2Activity extends AppCompatActivity implements android.app.Load
                 String json = appSharedPrefs.getString("MyObject", "");
                 Type type = new TypeToken<List<Newsinfo>>(){}.getType();
                 List<Newsinfo> NewsInfoList = gson.fromJson(json, type);
-                if(NewsInfoList== null){
+                if(NewsInfoList == null){
                     View loadingIndicator = findViewById(R.id.loading_indicator);
                     loadingIndicator.setVisibility(View.GONE);
                     //EmptyTextView should be initialised Showing no Connection or Error in connection
@@ -156,6 +156,16 @@ public class Main2Activity extends AppCompatActivity implements android.app.Load
         });
 
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
 
