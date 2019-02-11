@@ -25,6 +25,7 @@ public class NewsAdapter extends ArrayAdapter<Newsinfo> implements Filterable {
 
     private ArrayList<Newsinfo> filteredList;
     private FriendFilter friendFilter;
+    private ArrayList<Newsinfo> NewsInfoList;
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -53,7 +54,24 @@ public class NewsAdapter extends ArrayAdapter<Newsinfo> implements Filterable {
     NewsAdapter(Context context, ArrayList<Newsinfo> NewsInfoList) {
 
         super(context, 0, NewsInfoList);
+        this.NewsInfoList = NewsInfoList;
+        filteredList = NewsInfoList;
 
+    }
+
+    @Override
+    public int getCount() {
+        return filteredList.size();
+    }
+
+    @Override
+    public Newsinfo getItem(int position) {
+        return NewsInfoList.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
 
     public Filter getFilter() {
@@ -84,7 +102,7 @@ public class NewsAdapter extends ArrayAdapter<Newsinfo> implements Filterable {
 
                 // search content in friend list
                 for (int i=0; i < NewsInfoList.size();i++) {
-                    if (NewsInfoList.get(i).getnDescription().contains(constraint.toString().toLowerCase())) {
+                    if (NewsInfoList.get(i).getnDescription().toLowerCase().contains(constraint.toString().toLowerCase())) {
                         tempList.add(NewsInfoList.get(i));
                     }
                 }
